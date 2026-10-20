@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scam Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f4f6f8;
+            color: #222;
+        }
+        main {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        button {
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 6px;
+            background: #175cd3;
+            color: white;
+            cursor: pointer;
+        }
+        input { margin: 15px 0; max-width: 100%; }
+        .result, .error {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+        .result { background: #eef4ff; }
+        .error { background: #fff0f0; color: #a40000; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Scam Checker</h1>
+    <p>Upload a screenshot of a message to check for scam warning signs.</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="screenshot">Choose a screenshot (PNG or JPG):</label><br>
+        <input
+            id="screenshot"
+            type="file"
+            name="screenshot"
+            accept="image/png,image/jpeg"
+            required
+        ><br>
+        <button type="submit">Check message</button>
+    </form>
+
+    {% if error %}
+        <div class="error">
+            <strong>Could not check:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <section class="result">
+            <h2>{{ result.verdict }}</h2>
+            <p>Warning score: {{ result.score }}</p>
+
+            <h3>Warning signs found</h3>
+            {% if result.reasons %}
+                <ul>
+                {% for reason in result.reasons %}
+                    <li>
+                        <strong>{{ reason.name }}</strong>
+                        (+{{ reason.points }} points): {{ reason.why }}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No matching warning signs were detected.</p>
+            {% endif %}
+
+            <h3>Text extracted from your screenshot</h3>
+            <pre>{{ extracted_text }}</pre>
+        </section>
+    {% endif %}
+
+    <p><small>
+        This tool detects patterns, not certainty. A low score does not
+        prove a message is safe. Avoid uploading screenshots containing
+        private information.
+    </small></p>
+</main>
+</body>
+</html>
